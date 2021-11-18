@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: my-db
+  name: my-db
+  namespace: my-namespace
+spec:
+  ports:
+  - port: 5432
+    name: "my-db-service"
+  clusterIP: None
+  selector:
+    app: my-db

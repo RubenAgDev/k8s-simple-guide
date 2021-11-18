@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: my-app
+  name: my-app
+  namespace: my-namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+      annotations:
+        configHash: "" # The field we'll use to couple our ConfigMap and Deployment
+    spec:
+      containers:
+      - image: my-app-image:dev
+        name: my-app
+        args:
+        - sh
+        - ./startup.sh
+        ports:
+        - containerPort: 8000
+          name: my-app
+        env:
+        - name: SOME_SECRET
+          valueFrom:
+            secretKeyRef:
+              key: someSecret
+              name: my-secrets
+        - name: APPLICATION_CREDENTIALS
+          value: /var/secrets/key.json
+        envFrom:
+        - configMapRef:
+            name: my-config
+        volumeMounts:
+        - name: some-cloud-key
+          mountPath: /var/secrets
+      volumes:
+        - name: some-cloud-key
+          secret:
+            secretName: my-secrets
+      restartPolicy: Always

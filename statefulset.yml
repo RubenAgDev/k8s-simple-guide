@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: cache
+  name: cache
+  namespace: my-namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cache
+  serviceName: "cache"
+  template:
+    metadata:
+      labels:
+        app: cache
+    spec:
+      containers:
+      - image: redis:4-alpine
+        name: cache
+        ports:
+        - containerPort: 6379
+          name: cache
+        volumeMounts:
+        - mountPath: /data
+          name: app-cache
+  volumeClaimTemplates:
+  - metadata:
+      name: app-cache
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "standard"
+      resources:
+        requests:
+          storage: 1Gi
